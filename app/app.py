@@ -46,7 +46,21 @@ if st.button("Predict"):
     pred = model.predict(features_scaled)[0]
     prob = model.predict_proba(features_scaled)[0][1]
 
-    if pred == 1:
-        st.success(f"Prediction: PASS ✅ (Probability: {prob:.2f})")
+    # Risk score (probability of failing)
+    risk_score = 1 - prob
+
+    # Risk level logic
+    if risk_score < 0.4:
+        risk_level = "Low"
+        color = "green"
+    elif risk_score < 0.7:
+        risk_level = "Moderate"
+        color = "orange"
     else:
-        st.error(f"Prediction: FAIL ⚠️ (Probability: {1-prob:.2f})")
+        risk_level = "High"
+        color = "red"
+
+    st.markdown(f"""### 🎯 Risk Assessment Result- **Risk Level:** <span style='color:{color}'>{risk_level}</span>- **Risk Score:** {risk_score*100:.1f}%
+    📌 *This is an early-warning estimate based on behavioral and support-related factors only.*
+    """, unsafe_allow_html=True)
+
