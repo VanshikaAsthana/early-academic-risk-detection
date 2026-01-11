@@ -90,7 +90,7 @@ Predictions are presented as risk indicators, not deterministic judgments, to pr
 The system supports two prediction stages:
 
 - **Early Semester:** Uses behavioral and support-related features only
-- 
+
 - **Mid Semester:** Incorporates internal assessment scores to improve realism
 
 This mirrors real-world early-warning academic systems where prediction confidence increases as more academic data becomes available.
