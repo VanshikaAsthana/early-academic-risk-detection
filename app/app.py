@@ -3,6 +3,65 @@ import joblib
 import numpy as np
 
 # -----------------------------
+# Page Config
+# -----------------------------
+st.set_page_config(page_title="Academic Risk Assessment System", layout="centered")
+
+# -----------------------------
+# Custom CSS
+# -----------------------------
+st.markdown("""
+<style>
+body {
+    background-color: #f7f9fc;
+}
+
+.main-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: #4b5563;
+    margin-bottom: 25px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #111827;
+}
+
+.result-box {
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f1f5f9;
+    border-left: 6px solid #2563eb;
+    margin-top: 20px;
+}
+
+.low {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.moderate {
+    color: #d97706;
+    font-weight: bold;
+}
+
+.high {
+    color: #dc2626;
+    font-weight: bold;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# -----------------------------
 # Load models and scalers
 # -----------------------------
 model_early = joblib.load("../model_early.pkl")
@@ -12,44 +71,47 @@ model_mid = joblib.load("../model_mid.pkl")
 scaler_mid = joblib.load("../scaler_mid.pkl")
 
 # -----------------------------
-# App UI
+# Header
 # -----------------------------
-st.set_page_config(page_title="Academic Risk Predictor", layout="centered")
-
-st.title("🎓 Academic Risk Assessment System")
-st.write(
-    "This tool provides an **early-warning academic risk score** to help identify "
-    "students who may need additional support."
+st.markdown('<div class="main-title">Academic Risk Assessment System</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="subtitle">An early-warning tool to estimate student academic risk based on behavioral and academic indicators.</div>',
+    unsafe_allow_html=True
 )
 
 # -----------------------------
-# Prediction stage selector
+# Prediction Stage
 # -----------------------------
+st.markdown('<div class="section-title">Prediction Stage</div>', unsafe_allow_html=True)
+
 stage = st.radio(
-    "Select Prediction Stage",
+    "",
     [
         "Early Semester (behavioral factors only)",
         "Mid Semester (includes internal assessment)"
     ]
 )
 
-st.markdown("---")
-
 # -----------------------------
-# Input fields
+# Inputs
 # -----------------------------
-studytime = st.selectbox("Study Time (1 = very low, 4 = very high)", [1, 2, 3, 4])
-failures = st.number_input("Number of Past Failures", 0, 4, 0)
-absences = st.number_input("Number of Absences", 0, 100, 0)
+st.markdown('<div class="section-title">Student Information</div>', unsafe_allow_html=True)
 
-schoolsup = st.selectbox("School Support", ["yes", "no"])
-famsup = st.selectbox("Family Support", ["yes", "no"])
-paid = st.selectbox("Paid Classes", ["yes", "no"])
-activities = st.selectbox("Extracurricular Activities", ["yes", "no"])
-internet = st.selectbox("Internet Access at Home", ["yes", "no"])
-romantic = st.selectbox("Romantic Relationship", ["yes", "no"])
+col1, col2 = st.columns(2)
 
-# Mid-semester academic signal
+with col1:
+    studytime = st.selectbox("Study Time (1 = very low, 4 = very high)", [1, 2, 3, 4])
+    failures = st.number_input("Number of Past Failures", 0, 4, 0)
+    absences = st.number_input("Number of Absences", 0, 100, 0)
+    schoolsup = st.selectbox("School Support", ["yes", "no"])
+    famsup = st.selectbox("Family Support", ["yes", "no"])
+
+with col2:
+    paid = st.selectbox("Paid Classes", ["yes", "no"])
+    activities = st.selectbox("Extracurricular Activities", ["yes", "no"])
+    internet = st.selectbox("Internet Access", ["yes", "no"])
+    romantic = st.selectbox("Romantic Relationship", ["yes", "no"])
+
 if stage == "Mid Semester (includes internal assessment)":
     G1 = st.number_input("Mid-Semester Score (G1)", 0, 20, 10)
 
@@ -72,7 +134,7 @@ if st.button("Assess Academic Risk"):
         encode(paid),
         encode(activities),
         encode(internet),
-        encode(romantic),
+        encode(romantic)
     ]
 
     if stage == "Early Semester (behavioral factors only)":
@@ -84,35 +146,27 @@ if st.button("Assess Academic Risk"):
         features_scaled = scaler_mid.transform(features)
         model_used = model_mid
 
-    # Probability of PASS
     prob_pass = model_used.predict_proba(features_scaled)[0][1]
-
-    # Risk = probability of FAIL
     risk_score = 1 - prob_pass
 
-    # Risk level
     if risk_score < 0.4:
         risk_level = "Low"
-        color = "green"
+        css_class = "low"
     elif risk_score < 0.7:
         risk_level = "Moderate"
-        color = "orange"
+        css_class = "moderate"
     else:
         risk_level = "High"
-        color = "red"
+        css_class = "high"
 
     # -----------------------------
     # Output
     # -----------------------------
-    st.markdown("---")
-    st.markdown(
-        f"""
-        ### 🎯 Risk Assessment Result
-        - **Risk Level:** <span style="color:{color}; font-weight:bold">{risk_level}</span>
-        - **Risk Score:** {risk_score * 100:.1f}%
-
-        📌 *This is a {stage.lower()} prediction.  
-        The score represents an **early-warning estimate**, not a final academic outcome.*
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown(f"""
+    <div class="result-box">
+        <h3>Risk Assessment Result</h3>
+        <p>Risk Level: <span class="{css_class}">{risk_level}</span></p>
+        <p>Risk Score: {risk_score*100:.1f}%</p>
+        <p><i>This is a {stage.lower()} prediction based on available information.</i></p>
+    </div>
+    """, unsafe_allow_html=True)
