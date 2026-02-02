@@ -1,6 +1,38 @@
-import streamlit as st
 import joblib
 import numpy as np
+import base64
+import streamlit as st
+
+def add_bg_from_local(image_file):
+    with open(image_file, "rb") as f:
+        encoded_string = base64.b64encode(f.read()).decode()
+
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/jpg;base64,{encoded_string}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+add_bg_from_local("app/assets/bg.jpg")
+st.markdown("""
+<style>
+.main-container {
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 20px;
+    border-radius: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
 
 # -----------------------------
 # Page Config
