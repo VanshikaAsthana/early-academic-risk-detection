@@ -42,13 +42,11 @@ Explainability & bias analysis
 
 ## 📈 Models Used
 
-Logistic Regression (baseline)
+- Logistic Regression (interpretable baseline)
+- 
+- Random Forest (non-linear comparison model)
 
-Random Forest
-
-Gradient Boosting
-
-Evaluation metrics prioritize Recall and F1-score to minimize false negatives (missing at-risk students).
+Separate models are trained for early and mid-semester stages to ensure fair evaluation and realistic predictions.
 
 ## 🔍 Key Insights
 
@@ -86,6 +84,16 @@ Model decisions must be interpretable
 Bias across demographic groups is explicitly evaluated
 
 Predictions are presented as risk indicators, not deterministic judgments, to prevent misuse.
+
+### Multi-Stage Prediction Design
+
+The system supports two prediction stages:
+
+- **Early Semester:** Uses behavioral and support-related features only
+
+- **Mid Semester:** Incorporates internal assessment scores to improve realism
+
+This mirrors real-world early-warning academic systems where prediction confidence increases as more academic data becomes available.
 
 
 ## 🚀 Future Work
