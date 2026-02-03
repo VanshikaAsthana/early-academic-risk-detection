@@ -21,7 +21,7 @@ def add_bg_from_local(image_file):
         unsafe_allow_html=True
     )
 
-add_bg_from_local("app/assets/bg.jpg")
+add_bg_from_local("app/assets/bg1.jpg")
 st.markdown("""
 <style>
 .main-container {
